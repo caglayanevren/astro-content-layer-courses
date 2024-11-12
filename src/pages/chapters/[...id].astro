@@ -1,0 +1,51 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+
+export const getStaticPaths = (async () => {
+    const chapters = await getCollection("chapters");
+    return chapters.map((chapter) => ({
+        params: {
+            id: chapter.id,
+        },
+        props: chapter,
+    }));
+}) satisfies GetStaticPaths;
+
+const { id } = Astro.params;
+const chapter = Astro.props;
+
+const lessons = await getCollection(
+    "lessons",
+    (lesson) => lesson.data.chapter.id === id,
+);
+---
+
+<Layout title={`Chapters | ${chapter.data.title}`}>
+    <main>
+        <h1>{chapter.data.title}</h1>
+        {
+            lessons
+                .sort((a, b) => a.data.sortOrder - b.data.sortOrder)
+                .map(async (lesson) => (
+                    <article>
+                        <h2>{lesson.data.title}</h2>
+                        <p>{lesson.body}</p>
+                    </article>
+                ))
+        }
+    </main>
+</Layout>
+
+<style>
+    main {
+        margin: auto;
+        padding: 1rem;
+        width: 800px;
+        max-width: calc(100% - 2rem);
+        color: white;
+        font-size: 20px;
+        line-height: 1.6;
+    }
+</style>
