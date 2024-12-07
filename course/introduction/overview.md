@@ -1,6 +1,6 @@
 ---
 title: Overview
-sortOrder: 2
+sortOrder: 1
 chapter: introduction/about
 ---
 
